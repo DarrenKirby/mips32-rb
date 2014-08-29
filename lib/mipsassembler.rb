@@ -162,6 +162,11 @@ module Assembler
       mc += sprintf("%05b", args[0]) # RD
       mc += sprintf("%05b", args[2]) # Shamt
       mc += ops[op][2]               # Function
+    elsif ["div", "divu", "mult", "multu"].index(op)
+      mc += sprintf("%05b", args[0]) # RS
+      mc += sprintf("%05b", args[1]) # RT
+      mc += "0000000000"             # Not used
+      mc += ops[op][2]               # Function
     else
       mc += sprintf("%05b", args[1]) # RS
       mc += sprintf("%05b", args[2]) # RT
