@@ -91,7 +91,7 @@ module Assembler
 
     }
 
-    s = Kernel.caller[0]
+    q = Kernel.caller[0]
     if instruction == "syscall"
       mc = sprintf("%032b", 12) # syscall
       return [mc.to_i(2), mc]
@@ -99,18 +99,18 @@ module Assembler
     if ops[instruction.split[0]][0] == "R"
       mc = r_type(instruction,ops)
       print "Opcode: #{mc[0..5]} RS: #{mc[6..10]} RT: #{mc[11..15]} RD: #{mc[16..20]} " \
-             "Shamt: #{mc[21..25]} Function: #{mc[26..-1]}\n" if s[(s.index("`")+1)..-2] == "irb_binding"
+             "Shamt: #{mc[21..25]} Function: #{mc[26..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     elsif ops[instruction.split[0]][0] == "I"
       mc = i_type(instruction,ops)
-      print "Opcode: #{mc[0..5]} RS: #{mc[6..10]} RT: #{mc[11..15]} Immediate: #{mc[16..-1]}\n" if defined? conf.prompt_i
+      print "Opcode: #{mc[0..5]} RS: #{mc[6..10]} RT: #{mc[11..15]} Immediate: #{mc[16..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     elsif ops[instruction.split[0]][0] == "M"
       mc = m_type(instruction,ops)
-      print "Opcode: #{mc[0..5]} Base: #{mc[6..10]} RT: #{mc[11..15]} Offset: #{mc[16..-1]}\n" if defined? conf.prompt_i
+      print "Opcode: #{mc[0..5]} Base: #{mc[6..10]} RT: #{mc[11..15]} Offset: #{mc[16..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     elsif ops[instruction.split[0]][0] == "P"
       mc = p_type(instruction,ops)
     else
       mc = j_type(instruction,ops)
-      print "Opcode: #{mc[0..5]} Address: #{mc[6..-1]}\n" if defined? conf.prompt_i
+      print "Opcode: #{mc[0..5]} Address: #{mc[6..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     end
     [mc.to_i(2), mc]
   end
@@ -125,7 +125,7 @@ module Assembler
              :t8, :t9, :k0, :k1, :gp, :sp, :fp, :ra]
     n = []
     a.each do |reg|
-      reg[0] > 57 ? n << pos.index(reg.to_sym).to_i : n << reg.to_i
+      reg[0].ord > 57 ? n << pos.index(reg.to_sym).to_i : n << reg.to_i
     end
     n
   end

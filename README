@@ -1,0 +1,135 @@
+Author: Darren Kirby
+Email: bulliver@gmail.com
+
+This is my attempt to write a Mips32 emulator in Ruby. It is kind of turning
+into a real-time interpreter of Mips32 assembly language source code. It is
+currently intended to be run directly from irb. It is probably not ready for
+primetime yet, and there is not much for documentation so far, however, if you
+want to have a play you can do stuff like:
+
+user@box$ irb
+irb(main):001:0> load 'mips.rb'
+=> true
+irb(main):002:0> vm = Mips32.new
+=> #<Mips32:0x7ff90488623>
+irb(main):003:0> vm.assemble("ori $t0,$zero,300")
+Opcode: 001101 RS: 00000 RT: 01000 Immediate: 0000000100101100
+=> [872939820, "00110100000010000000000100101100"]
+irb(main):004:0> vm.assemble("add $t0,$t1,$t2")
+Opcode: 000000 RS: 01001 RT: 01010 RD: 01000 Shamt: 00000 Function: 100000
+=> [19546144, "00000001001010100100000000100000"]
+
+Note that the 'assemble' method doesn't actually execute anything, it just
+returns a bitstring representing the 'assembled' instruction in binary.
+The assembly instructions themselves are all written as methods, but they
+require Ruby syntax like so:
+
+irb(main):005:0> vm.ori(:t0,:zero,300)
+=> 300
+irb(main):006:0> vm.ori(:t1,:zero,200)
+=> 200
+irb(main):007:0> vm.add(:t2,:t0,:t1)
+=> 500
+
+So the register names must be passed as Ruby symbols. Now that we've actually
+done something we can check the state of our registers:
+
+irb(main):008:0> vm.dump_registers
+    General Registers
+$zero |           0 |  0x00000000  |  00000000000000000000000000000000
+$at   |           0 |  0x00000000  |  00000000000000000000000000000000
+$v0   |           0 |  0x00000000  |  00000000000000000000000000000000
+$v1   |           0 |  0x00000000  |  00000000000000000000000000000000
+$a0   |           0 |  0x00000000  |  00000000000000000000000000000000
+$a1   |           0 |  0x00000000  |  00000000000000000000000000000000
+$a2   |           0 |  0x00000000  |  00000000000000000000000000000000
+$a3   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t0   |         300 |  0x0000012c  |  00000000000000000000000100101100
+$t1   |         200 |  0x000000c8  |  00000000000000000000000011001000
+$t2   |         500 |  0x000001f4  |  00000000000000000000000111110100
+$t3   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t4   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t5   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t6   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t7   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s0   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s1   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s2   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s3   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s4   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s5   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s6   |           0 |  0x00000000  |  00000000000000000000000000000000
+$s7   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t8   |           0 |  0x00000000  |  00000000000000000000000000000000
+$t9   |           0 |  0x00000000  |  00000000000000000000000000000000
+$k0   |           0 |  0x00000000  |  00000000000000000000000000000000
+$k1   |           0 |  0x00000000  |  00000000000000000000000000000000
+$gp   |   268468224 |  0x10008000  |  00010000000000001000000000000000
+$sp   |  2147483644 |  0x7ffffffc  |  01111111111111111111111111111100
+$fp   |           0 |  0x00000000  |  00000000000000000000000000000000
+$ra   |           0 |  0x00000000  |  00000000000000000000000000000000
+    Special Registers
+$pc   |     4194304 |  0x00400000  |  00000000010000000000000000000000
+$hi   |           0 |  0x00000000  |  00000000000000000000000000000000
+$lo   |           0 |  0x00000000  |  00000000000000000000000000000000
+$epc  |           0 |  0x00000000  |  00000000000000000000000000000000
+=> true
+
+So we can see the values have actually been added and placed in the appropriate
+registers. We can also load a file of assembly instructions:
+
+irb(main):009:0> vm.load_file("../assembly/mips.s")
+=> 4194304
+
+The 'load_file' method loads the file, places variables into global memory,
+and loads the instructions into our program data section of memory:
+
+irb(main):010:0> vm.dump_memory
+0x10008000:
+0x10008028: "Type a string: "
+0x10008039: "You typed: "
+=> true
+irb(main):011:0> vm.dump_program_data
+0x00400000: ori  $s0,$zero,250   00110100000100000000000011111010
+0x00400004: ori  $s1,$zero,300   00110100000100010000000100101100
+0x00400008: add  $t0,$s0,$s1     00000010000100010100000000100000
+0x0040000c: ori  $t6,$zero,456   00110100000011100000000111001000
+0x00400010: ori  $t1,$zero,3000  00110100000010010000101110111000
+0x00400014: div  $t1,$t0         00000001000000000100100000011010
+0x00400018: mflo $t2             00000000000000000101000000010010
+0x0040001c: mfhi $t3             00000000000000000101100000010000
+0x00400020: sll  $t4,$t1,2       00000000000010010110000010000000
+0x00400024: sll  $t5,$t1,4       00000000000010010110100100000000
+0x00400028: li   $v0,4           00110100000000100000000000000100
+0x0040002c: la   $a0,prompt      00000000000000000000000000000000
+0x00400030: syscall              00000000000000000000000000001100
+0x00400034: li   $v0,8           00110100000000100000000000001000
+0x00400038: li   $a1,40          00110100000001010000000000101000
+0x0040003c: la   $a0,buf         00000000000000000000000000000000
+0x00400040: syscall              00000000000000000000000000001100
+0x00400044: li   $v0,4           00110100000000100000000000000100
+0x00400048: la   $a0,prompt2     00000000000000000000000000000000
+0x0040004c: syscall              00000000000000000000000000001100
+0x00400050: li   $v0,4           00110100000000100000000000000100
+0x00400054: la   $a0,buf         00000000000000000000000000000000
+0x00400058: syscall              00000000000000000000000000001100
+=> true
+
+'load_file' only places the instructions in program data, to actually run them
+use 'execute' and if all goes well you will get a 'true' back, and your
+registers will be full of the values dictated by the instructions. BE CAREFUL
+with this, as everything you do is actually run on the host computer. There are
+syscalls for reading/writing files, and if you write and execute an assembly
+file to open your /etc/passwd file and write gibberish into it this program
+will actually do so!
+
+BE WARNED!
+DO NOT RUN AS ANY SORT OF PRIVELEGED USER!
+
+If you cannot read the source and tell what this program is doing you should
+probably not use it until it is polished up a bit.
+
+Also, many things are currently broken, and many things (especially Mips
+instructions) are not yet imlemented. Things change everyday. I will roll out
+an actual release when I feel the program is ready. Until then, hack on it and
+have fun.

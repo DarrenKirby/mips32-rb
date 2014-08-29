@@ -19,6 +19,7 @@ module MipsCodeRunner
 
   def load_file(file)
     load_file_into_program_data(file)
+    true
   end
 
   def execute
