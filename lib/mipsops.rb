@@ -175,26 +175,120 @@ module MipsOps
   #
 
   # Add (signed)
-  def add(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] + @registers.gen[reg_2]
+  #
+  #  $RD = $RS + RT (traps on overflow)
+  #  format: 'add rd,rs,rt'
+  def add(rd, rs, rt)
+    tmp = @registers.gen[rs] + @registers.gen[rt]
+    if tmp > SIGNED_MAX
+      raise Mips32Error, "Arithmetic overflow"
+    end
+    @registers.gen[rd] = tmp
+    true
+  end
+
+  # Add Immediate (signed)
+  #
+  # $RD = $RS + Immediate (traps on overflow)
+  # format: 'addi rd,rs,imm'
+  def addi(rd, rs, immediate)
+    tmp = @registers.gen[rs] + immediate
+    if tmp > SIGNED_MAX
+      raise Mips32Error, "Arithmetic overflow"
+    end
+    @registers.gen[rd] = tmp
+    true
+  end
+
+  # Add Immediate Unsigned
+  #
+  # $RD = $RS + Immediate
+  # format: 'addiu rd,rs,imm'
+  def addiu(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] + immediate
+    true
+  end
+
+  # Add Word Unsigned
+  #
+  # $RD = $RS + RT
+  # format: 'addu rd,rs,rt'
+  def addu(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] + @registers.gen[rt]
+    true
+  end
+
+  # Count Leading Ones in Word
+  #
+  # $RD = count_leading_ones($RS)
+  # format: 'clo rd,rs'
+  def clo(rd, rs)
+    true
+  end
+
+  # Count leading Zeros in Word
+  #
+  # $RD = count_leading_zeros($RS)
+  # format: 'clz rd,rs'
+  def clz(rd, rs)
+    true
+  end
+
+  # Divide Word (signed, but doesn't trap overflow)
+  #
+  # $LO = $RS / $RT
+  # $HI = $RS % $RT
+  # format: 'div rs,rt'
+  def div(rs, rt)
+    @registers.spe[:lo] = @registers.gen[rs] / @registers.gen[rt]
+    @registers.spe[:hi] = @registers.gen[rs] % @registers.gen[rt]
+    true
+  end
+
+  # Divide Word Unsigned
+  #
+  # $LO = $RS / $RT
+  # $HI = $RS % $RT
+  # format: 'divu rs,rt'
+  def divu(rs, rt)
+    @registers.spe[:lo] = @registers.gen[rs] / @registers.gen[rt]
+    @registers.spe[:hi] = @registers.gen[rs] % @registers.gen[rt]
+    true
+  end
+
+  # Multiply and Add Word to Hi, Lo (signed, but does not trap on overflow)
+  #
+  # $Lo,$Hi = $RS x $RT
+  # Multiply 2 32 bit integers. LSB placed in $LO, MSB placed in $HI
+  def madd(rs, rt)
+    if tmp > UNSIGNED_MAX
+      @registers.spe[:lo] = UNSIGNED_MAX
+      @registers.spe[:hi] = tmp - UNSIGNED_MAX
+    else
+      @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
+    end
+    true
+  end
+
+  # Multiply and Add Unsigned Word to Hi, Lo
+  #
+  # $Lo,$Hi = $RS x $RT
+  # Multiply 2 32 bit integers. LSB placed in $LO, MSB placed in $HI
+  def maddu(rs, rt)
+    if tmp > UNSIGNED_MAX
+      @registers.spe[:lo] = UNSIGNED_MAX
+      @registers.spe[:hi] = tmp - UNSIGNED_MAX
+    else
+      @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
+    end
     true
   end
 
   # Subtract (signed)
   def sub(dest_reg, reg_1, reg_2)
     @registers.gen[dest_reg] = @registers.gen[reg_1] - @registers.gen[reg_2]
-    true
-  end
-
-  # Add Immediate
-  def addi(dest_reg, reg_1, immediate)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] + immediate
-    true
-  end
-
-  # Add Unsigned
-  def addu(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] + @registers.gen[reg_2]
     true
   end
 
@@ -216,7 +310,7 @@ module MipsOps
   # Multiply Unsigned
   def multu(reg_1, reg_2)
     tmp = @registers.gen[reg_1] * @registers.gen[reg_2]
-    if tmp > UNSIGNED_MAX #  Overflow?
+    if tmp > UNSIGNED_MAX
       @registers.spe[:lo] = UNSIGNED_MAX
       @registers.spe[:hi] = tmp - UNSIGNED_MAX
     else
@@ -225,19 +319,7 @@ module MipsOps
     true
   end
 
-  # Divide
-  def div(reg_1, reg_2)
-    @registers.spe[:lo] = @registers.gen[reg_1] / @registers.gen[reg_2] #  Lo = $t5 / $t6   (integer quotient)
-    @registers.spe[:hi] = @registers.gen[reg_1] % @registers.gen[reg_2] #  Hi = $t5 mod $t6   (remainder)
-    true
-  end
 
-  # Divide Unsigned
-  def divu(reg_1, reg_2)
-    @registers.spe[:lo] = @registers.gen[reg_1] / @registers.gen[reg_2] #  Lo = $t5 / $t6   (integer quotient)
-    @registers.spe[:hi] = @registers.gen[reg_1] % @registers.gen[reg_2] #  Hi = $t5 mod $t6   (remainder)
-    true
-  end
 
   # Move From Hi
   def mfhi(dest_reg)
@@ -382,7 +464,7 @@ module MipsOps
       @registers.gen[:v0] = chars.length
       #= @registers.gen[:a1]
       #= @registers.gen[:a2]
-    when 15                                        # write to file
+    when 15                                      # write to file
       # $a0 = file desciptor
       # $a1 = address of output buffer
       # $a2 = number of characters to write

@@ -154,7 +154,7 @@ class Mips32
       k_arr << k
     end
     k_arr.sort.each do |a|
-      puts sprintf("0x%08x: %-20s %032s", a, @memory.data[a], assemble(@memory.data[a])[1])
+      puts sprintf("0x%08x: %-20s %032s", a, @memory.data[a], assemble(@memory.data[a]))
     end
   end
 

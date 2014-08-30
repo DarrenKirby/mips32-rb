@@ -26,6 +26,10 @@ module Assembler
       "add"   => [ "R", "000000", "100000" ],
       "addu"  => [ "R", "000000", "100001" ],
       "and"   => [ "R", "000000", "100100" ],
+      "clo"   => [ "R", "011100", "100001" ],
+      "clz"   => [ "R", "011100", "100000" ],
+      "madd"  => [ "R", "011100", "000000" ],
+      "maddu" => [ "R", "011100", "000001" ],
       "jr"    => [ "R", "000000", "001000" ],
       "nor"   => [ "R", "000000", "100111" ],
       "or"    => [ "R", "000000", "100101" ],
@@ -91,11 +95,11 @@ module Assembler
 
     }
 
-    q = Kernel.caller[0]
     if instruction == "syscall"
-      mc = sprintf("%032b", 12) # syscall
-      return [mc.to_i(2), mc]
+      mc = sprintf("%032b", 12)
+      return mc
     end
+    q = Kernel.caller[0]
     if ops[instruction.split[0]][0] == "R"
       mc = r_type(instruction,ops)
       print "Opcode: #{mc[0..5]} RS: #{mc[6..10]} RT: #{mc[11..15]} RD: #{mc[16..20]} " \
@@ -112,7 +116,7 @@ module Assembler
       mc = j_type(instruction,ops)
       print "Opcode: #{mc[0..5]} Address: #{mc[6..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     end
-    [mc.to_i(2), mc]
+    mc
   end
 
   private
@@ -141,10 +145,10 @@ module Assembler
     if op == "la"
       # lui $at, %lo[addr]
       # addiu $2, $at, $hi[addr]
-      # FIXME:
+      # FIXME: Not sure yet how to deal with pseudos
+      # that expand to more than one instruction
       return "00000000000000000000000000000000"
     end
-
 
     if op == "move"
       return r_type("add #{a[0]},$zero,#{a[1]}", ops)
@@ -162,10 +166,16 @@ module Assembler
       mc += sprintf("%05b", args[0]) # RD
       mc += sprintf("%05b", args[2]) # Shamt
       mc += ops[op][2]               # Function
-    elsif ["div", "divu", "mult", "multu"].index(op)
+    elsif ["div", "divu", "madd", "maddu", "mult", "multu"].index(op)
       mc += sprintf("%05b", args[0]) # RS
       mc += sprintf("%05b", args[1]) # RT
-      mc += "0000000000"             # Not used
+      mc += "0000000000"             # RD and Shamt are n/a
+      mc += ops[op][2]               # Function
+    elsif ["clo", "clz"].index(op)
+      mc += sprintf("%05b", args[1]) # RS
+      mc += sprintf("%05b", args[1]) # RT (must be the same as RS)
+      mc += sprintf("%05b", args[0]) # RD
+      mc += "00000"                  # Shamt is n/a
       mc += ops[op][2]               # Function
     else
       mc += sprintf("%05b", args[1]) # RS
