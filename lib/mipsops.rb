@@ -177,7 +177,7 @@ module MipsOps
   # Add (signed)
   #
   #  $RD = $RS + RT (traps on overflow)
-  #  format: 'add rd,rs,rt'
+  #  Asm format: 'add $rd,$rs,$rt'
   def add(rd, rs, rt)
     tmp = @registers.gen[rs] + @registers.gen[rt]
     if tmp > SIGNED_MAX
@@ -190,7 +190,7 @@ module MipsOps
   # Add Immediate (signed)
   #
   # $RD = $RS + Immediate (traps on overflow)
-  # format: 'addi rd,rs,imm'
+  # Asm format: 'addi $rd,$rs,imm'
   def addi(rd, rs, immediate)
     tmp = @registers.gen[rs] + immediate
     if tmp > SIGNED_MAX
@@ -203,7 +203,7 @@ module MipsOps
   # Add Immediate Unsigned
   #
   # $RD = $RS + Immediate
-  # format: 'addiu rd,rs,imm'
+  # Asm format: 'addiu $rd,$rs,imm'
   def addiu(rd, rs, immediate)
     @registers.gen[rd] = @registers.gen[rs] + immediate
     true
@@ -212,7 +212,7 @@ module MipsOps
   # Add Word Unsigned
   #
   # $RD = $RS + RT
-  # format: 'addu rd,rs,rt'
+  # Asm format: 'addu $rd,$rs,$rt'
   def addu(rd, rs, rt)
     @registers.gen[rd] = @registers.gen[rs] + @registers.gen[rt]
     true
@@ -221,7 +221,7 @@ module MipsOps
   # Count Leading Ones in Word
   #
   # $RD = count_leading_ones($RS)
-  # format: 'clo rd,rs'
+  # Asm format: 'clo $rd,$rs'
   def clo(rd, rs)
     true
   end
@@ -229,7 +229,7 @@ module MipsOps
   # Count leading Zeros in Word
   #
   # $RD = count_leading_zeros($RS)
-  # format: 'clz rd,rs'
+  # Asm format: 'clz $rd,$rs'
   def clz(rd, rs)
     true
   end
@@ -238,7 +238,7 @@ module MipsOps
   #
   # $LO = $RS / $RT
   # $HI = $RS % $RT
-  # format: 'div rs,rt'
+  # Asm format: 'div $rs,$rt'
   def div(rs, rt)
     @registers.spe[:lo] = @registers.gen[rs] / @registers.gen[rt]
     @registers.spe[:hi] = @registers.gen[rs] % @registers.gen[rt]
@@ -249,7 +249,7 @@ module MipsOps
   #
   # $LO = $RS / $RT
   # $HI = $RS % $RT
-  # format: 'divu rs,rt'
+  # Asm format: 'divu $rs,$rt'
   def divu(rs, rt)
     @registers.spe[:lo] = @registers.gen[rs] / @registers.gen[rt]
     @registers.spe[:hi] = @registers.gen[rs] % @registers.gen[rt]
@@ -258,12 +258,15 @@ module MipsOps
 
   # Multiply and Add Word to Hi, Lo (signed, but does not trap on overflow)
   #
-  # $Lo,$Hi = $RS x $RT
-  # Multiply 2 32 bit integers. LSB placed in $LO, MSB placed in $HI
+  # $Lo,$Hi = $Lo,$Hi + $RS x $RT
+  # Multiply 2 32 bit integers. Add to values in Lo and Hi, LSB placed in $LO, MSB placed in $HI
+  # Asm format 'madd $rs,$rt'
   def madd(rs, rt)
-    if tmp > UNSIGNED_MAX
-      @registers.spe[:lo] = UNSIGNED_MAX
-      @registers.spe[:hi] = tmp - UNSIGNED_MAX
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    tmp += (@registers.spe[:lo] + @registers.spe[hi])
+    if tmp > SIGNED_MAX
+      @registers.spe[:lo] = SIGNED_MAX
+      @registers.spe[:hi] = tmp - SIGNED_MAX
     else
       @registers.spe[:lo] = tmp
       @registers.spe[:hi] = 0
@@ -273,9 +276,12 @@ module MipsOps
 
   # Multiply and Add Unsigned Word to Hi, Lo
   #
-  # $Lo,$Hi = $RS x $RT
-  # Multiply 2 32 bit integers. LSB placed in $LO, MSB placed in $HI
+  # $Lo,$Hi = $Lo,$Hi + $RS x $RT
+  # Multiply 2 32 bit integers. Add to values in Lo and Hi, LSB placed in $LO, MSB placed in $HI
+  # format: 'maddu rs,rt'
   def maddu(rs, rt)
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    tmp += (@registers.spe[:lo] + @registers.spe[hi])
     if tmp > UNSIGNED_MAX
       @registers.spe[:lo] = UNSIGNED_MAX
       @registers.spe[:hi] = tmp - UNSIGNED_MAX
@@ -286,40 +292,122 @@ module MipsOps
     true
   end
 
-  # Subtract (signed)
-  def sub(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] - @registers.gen[reg_2]
-    true
-  end
-
-  # Subtract Unsigned
-  def subu(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] - @registers.gen[reg_2]
-    true
-  end
-
-  # multiply 32-bit quantities in $t3 and $t4, and store 64-bit
-  # result in special registers Lo and Hi:  (Hi,Lo) = $t3 * $t4
-  # Multiply
-  def mult(reg_1, reg_2)
-    tmp = @registers.gen[reg_1] * @registers.gen[reg_2]
-    #if tmp > SIGNED #  Overflow?
-    #end
-  end
-
-  # Multiply Unsigned
-  def multu(reg_1, reg_2)
-    tmp = @registers.gen[reg_1] * @registers.gen[reg_2]
+  # Multiply and Subtract Word to Hi, Lo (signed, but does not trap on overflow)
+  #
+  # $Lo,$hi = $Lo,$Hi - $RS x $RT
+  # Multiply 2 32 bit integers. Subtract from values in Lo and Hi, LSB placed in $LO, MSB placed in $HI
+  # Asm format: 'msub $rs,$rt'
+  def msub(rs, rt)
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    tmp -= (@registers.spe[:lo] + @registers.spe[hi])
     if tmp > UNSIGNED_MAX
       @registers.spe[:lo] = UNSIGNED_MAX
       @registers.spe[:hi] = tmp - UNSIGNED_MAX
     else
       @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
     end
     true
   end
 
+  # Multiply and Subtract Unsigned Word to Hi, Lo
+  #
+  # $Lo,$hi = $Lo,$Hi - $RS x $RT
+  # Multiply 2 32 bit integers. Subtract from values in Lo and Hi, LSB placed in $LO, MSB placed in $HI
+  # Asm format: 'msubu $rs,$rt'
+  def msubu(rs, rt)
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    tmp -= (@registers.spe[:lo] + @registers.spe[hi])
+    if tmp > UNSIGNED_MAX
+      @registers.spe[:lo] = UNSIGNED_MAX
+      @registers.spe[:hi] = tmp - UNSIGNED_MAX
+    else
+      @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
+    end
+    true
+  end
 
+  # Multiply Word to General Register
+  #
+  # $RD = $RS * $RT
+  # Asm format: 'mul $rd,$rs,$rt'
+  def mul(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] * @registers.gen[rt]
+    true
+  end
+
+  # Multiply Word (signed, but does not trap on overflow)
+  #
+  # $Lo,$Hi = $RS * $RT
+  # Asm format: 'mult $rs,$rt'
+  def mult(rs, rt)
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    if tmp > SIGNED_MAX
+      @registers.spe[:lo] = SIGNED_MAX
+      @registers.spe[:hi] = tmp - SIGNED_MAX
+    else
+      @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
+    end
+    true
+  end
+
+  # Multiply Word Unsigned
+  #
+  # $Lo,$Hi = $RS * $RT
+  # Asm format: 'multu $rs,$rt'
+  def multu(rs, rt)
+    tmp = @registers.gen[rs] * @registers.gen[rt]
+    if tmp > UNSIGNED_MAX
+      @registers.spe[:lo] = UNSIGNED_MAX
+      @registers.spe[:hi] = tmp - UNSIGNED_MAX
+    else
+      @registers.spe[:lo] = tmp
+      @registers.spe[:hi] = 0
+    end
+    true
+  end
+
+  # Sign-Extend Byte
+  #
+  # $RD = sign_extend($RT)
+  # Asm format: 'seb $rd,$rt'
+  def seb(rd, rt)
+    true
+  end
+
+  # Sign-Extend Halfword
+  #
+  # $RD = sign_extend($RT)
+  # Asm format: 'seh $rd,$rt'
+  def seh(rd, rt)
+    true
+  end
+
+  # Subtract (signed)
+  #
+  # $RD = $RS - $RT
+  # Asm format: 'sub $rd,$rs,$rt'
+  def sub(rd, rs, rt)
+    tmp = @registers.gen[rs] - @registers.gen[rt]
+    if tmp < SIGNED_MIN
+      raise Mips32Error, "Arithmetic overflow"
+    end
+    @registers.gen[rd] = tmp
+    true
+  end
+
+  # Subtract Unsigned
+  #
+  # $RD = $RS - $RT
+  # Asm format: 'sub $rd,$rs,$rt'
+  def subu(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] - @registers.gen[rt]
+    true
+  end
+
+#########
 
   # Move From Hi
   def mfhi(dest_reg)
@@ -346,6 +434,8 @@ module MipsOps
     @registers.gen[dest_reg] = @registers.gen[source_reg]
     true
   end
+##############
+
 
   # Control Structures
   #

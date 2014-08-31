@@ -135,13 +135,14 @@ class Mips32
     else
       puts "#{which}: #{@memory.core[which]}"
     end
-    @memory.core
+    true
   end
 
   def dump_symbol_table
     @memory.symbol_table.each_pair do |k,v|
       puts sprintf("#{k} => 0x%08x", v)
     end
+    true
   end
 
   # Dumps pretty-printed representation of program data memory
@@ -156,6 +157,7 @@ class Mips32
     k_arr.sort.each do |a|
       puts sprintf("0x%08x: %-20s %032s", a, @memory.data[a], assemble(@memory.data[a]))
     end
+    true
   end
 
   def inspect #:nodoc:
@@ -165,15 +167,18 @@ class Mips32
 
   def reset_registers
     @registers = Register.new
+    true
   end
 
   def reset_memory
     @memory = Memory.new
+    true
   end
 
   def reset_all
     @registers = Register.new
     @memory =    Memory.new
+    true
   end
 
   alias d_reg dump_registers

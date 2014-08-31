@@ -30,9 +30,14 @@ module Assembler
       "clz"   => [ "R", "011100", "100000" ],
       "madd"  => [ "R", "011100", "000000" ],
       "maddu" => [ "R", "011100", "000001" ],
+      "mul"   => [ "R", "011100", "000010" ],
+      "mult"  => [ "R", "000000", "011000" ],
+      "multu" => [ "R", "000000", "011001" ],
       "jr"    => [ "R", "000000", "001000" ],
       "nor"   => [ "R", "000000", "100111" ],
       "or"    => [ "R", "000000", "100101" ],
+      "seb"   => [ "R", "011111", "100000" ],
+      "seh"   => [ "R", "011111", "100000" ],
       "slt"   => [ "R", "000000", "101010" ],
       "sltu"  => [ "R", "000000", "101011" ],
       "sll"   => [ "R", "000000", "000000" ],
@@ -43,9 +48,6 @@ module Assembler
       "divu"  => [ "R", "000000", "011011" ],
       "mfhi"  => [ "R", "000000", "010000" ],
       "mflo"  => [ "R", "000000", "010010" ],
-      "mul"   => [ "R", "011100", "000010" ],
-      "mult"  => [ "R", "000000", "011000" ],
-      "multu" => [ "R", "000000", "011001" ],
       "mfc0"  => [ "R", "010000", "000000" ],
 
     # I-Format Instructions
@@ -174,6 +176,17 @@ module Assembler
     elsif ["clo", "clz"].index(op)
       mc += sprintf("%05b", args[1]) # RS
       mc += sprintf("%05b", args[1]) # RT (must be the same as RS)
+      mc += sprintf("%05b", args[0]) # RD
+      mc += "00000"                  # Shamt is n/a
+      mc += ops[op][2]               # Function
+    elsif ["seb", "seh"].index(op)
+      mc += "00000"                           # RS is n/a
+      mc += sprintf("%05b", args[1])          # RT
+      mc += sprintf("%05b", args[0])          # RD
+      mc += (op == "seb" ? "10000" : "11000") # Shamt
+      mc += ops[op][2]                        # Function
+    elsif ["mflo", "mfhi"].index(op)
+      mc+= "0000000000"              # RS and RT n/a
       mc += sprintf("%05b", args[0]) # RD
       mc += "00000"                  # Shamt is n/a
       mc += ops[op][2]               # Function
