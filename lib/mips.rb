@@ -1,5 +1,5 @@
-#
 #!/usr/bin/ruby
+#
 # = Description
 #
 # A MIPS32 emulator

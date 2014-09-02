@@ -30,32 +30,32 @@ module MipsOps
   # Aligned load/store instructions
 
   # Load Word
-  def lw(dest_reg, source_mem)
-    @registers.gen[dest_reg] = @memory.core[source_mem]
+  def lw(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
   # Load Half-Word
-  def lh(dest_reg, source_mem)
-    @registers.gen[dest_reg] = @memory.core[source_mem]
+  def lh(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
   # Load Half-word Unsigned
-  def lhu(dest_reg, source_mem)
-    @registers.gen[dest_reg] = @memory.core[source_mem]
+  def lhu(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
   # Load Byte
-  def lb(dest_reg, source_mem)
-    @registers.gen[dest_reg] = @memory.core[source_mem]
+  def lb(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
   # Load Byte Unsigned
-  def lbu(dest_reg, source_mem)
-    @registers.gen[dest_reg] = @memory.core[source_mem]
+  def lbu(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
@@ -117,15 +117,15 @@ module MipsOps
 
   # Pseudo instruction
   # Load Immediate
-  def li(dest_reg, value)
-    @registers.gen[dest_reg] = value
+  def li(rd, value)
+    @registers.gen[rd] = value
     true
   end
 
   # Pseudo instruction
   # Load Address
-  def la(dest_reg, label)
-    @registers.gen[dest_reg] = @memory.symbol_table[label]
+  def la(rd, label)
+    @registers.gen[rd] = @memory.symbol_table[label]
     true
   end
 
@@ -135,38 +135,42 @@ module MipsOps
   #
 
   # And
-  def and_l(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] & @registers.gen[reg_2]
+  def and_l(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] & @registers.gen[rt]
   end
 
   # And Immediate
-  def andi(dest_reg, reg_1, immediate)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] & immediate
+  def andi(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] & immediate
+  end
+
+  def lui()
+    true
   end
 
   # Nor
-  def nor(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = ~ (@registers.gen[reg_1] | @registers.gen[reg_2])
+  def nor(rd, rs, rt)
+    @registers.gen[rd] = ~ (@registers.gen[rs] | @registers.gen[rt])
   end
 
   # Or
-  def or_l(dest_reg, reg_1, reg_2)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] | @registers.gen[reg_2]
+  def or_l(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] | @registers.gen[rt]
   end
 
   # Or Immediate
-  def ori(dest_reg, reg_1, immediate)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] | immediate
+  def ori(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] | immediate
   end
 
   # Shift Left Logical
-  def sll(dest_reg, reg_1, immediate)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] << immediate
+  def sll(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] << immediate
   end
 
   # Shift Right Logical
-  def srl(dest_reg, reg_1, immediate)
-    @registers.gen[dest_reg] = @registers.gen[reg_1] >> immediate
+  def srl(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] >> immediate
   end
 
   # Arithmetic Instructions
@@ -385,6 +389,58 @@ module MipsOps
     true
   end
 
+  # Set On Less Than
+  #
+  # $RD = 1 if $RS < $RT else 0
+  # Asm format: 'slt $rd,$rs,$rt'
+  def slt(rd, rs, rt)
+    if @register.gen[rs] < @register.gen[rt]
+      @register.gen[rd] = 1
+    else
+      @register.gen[rd] = 0
+    end
+    true
+  end
+
+  # Set On Less Than Immediate
+  #
+  # $RD = 1 if $RS < Immediate
+  # Asm format: 'slti $rd,$rs,imm'
+  def slti(rd, rs, imm)
+    if @register.gen[rs] < imm
+      @register.gen[rd] = 1
+    else
+      @register.gen[rd] = 0
+    end
+    true
+  end
+
+  # Set On Less Than Immediate Unsigned
+  #
+  # $RD = 1 if $RS < Immediate
+  # Asm format: 'sltiu $rd,$rs,imm'
+  def sltiu()
+    if @register.gen[rs] < imm
+      @register.gen[rd] = 1
+    else
+      @register.gen[rd] = 0
+    end
+    true
+  end
+
+  # Set on Less Than Unsigned
+  #
+  # $RD = 1 if $RS < $RT else 0
+  # Asm format: 'sltu $rd,$rs,imm'
+  def sltu(rd, rs, rt)
+    if @register.gen[rs] < @register.gen[rt]
+      @register.gen[rd] = 1
+    else
+      @register.gen[rd] = 0
+    end
+    true
+  end
+
   # Subtract (signed)
   #
   # $RD = $RS - $RT
@@ -410,28 +466,28 @@ module MipsOps
 #########
 
   # Move From Hi
-  def mfhi(dest_reg)
-    @registers.gen[dest_reg] = @registers.spe[:hi]
+  def mfhi(rd)
+    @registers.gen[rd] = @registers.spe[:hi]
     true
   end
 
   # Move From Lo
-  def mflo(dest_reg)
-    @registers.gen[dest_reg] = @registers.spe[:lo]
+  def mflo(rd)
+    @registers.gen[rd] = @registers.spe[:lo]
     true
   end
 
   # Move From Coprocessor Register
   # FIXME:
-  def mfc0(dest_reg, spec_reg)
-    @registers.gen[dest_reg] = @registers.spe[spec_reg]
+  def mfc0(rd, spec_reg)
+    @registers.gen[rd] = @registers.spe[spec_reg]
     true
   end
 
   # Pseudo instruction
   # Move
-  def move(dest_reg, source_reg)
-    @registers.gen[dest_reg] = @registers.gen[source_reg]
+  def move(rd, source_reg)
+    @registers.gen[rd] = @registers.gen[source_reg]
     true
   end
 ##############
