@@ -5,6 +5,8 @@
 .data
 
 prompt:   .ascii   "Type an integer: "
+prompt2:  .ascii   "Type another integer: "
+
 
 .text
 
@@ -18,7 +20,7 @@ syscall                              # call the operating system
 move $s0,$v0                         # move first integer to $s0
 
 li  $v0,4                            # place print string code in $v0
-la  $a0,prompt                       # address of prompt
+la  $a0,prompt2                      # address of prompt
 syscall                              # call the operating system
 
 li  $v0,5                            # place read int code in $v0

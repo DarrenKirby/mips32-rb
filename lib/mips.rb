@@ -167,12 +167,12 @@ class Mips32
 
   def reset_registers
     @registers = Register.new
-    true
+    #true
   end
 
   def reset_memory
     @memory = Memory.new
-    true
+    #true
   end
 
   def reset_all

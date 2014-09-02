@@ -129,39 +129,87 @@ module MipsOps
     true
   end
 
-  # Logical/Bitwise Instruction
+  # Logical/Bitwise Instructions
   #
   #
   #
 
   # And
+  #
+  # $RD = $RS & $RT
+  # Asm format: 'and $rd,$rs,$rt'
   def and_l(rd, rs, rt)
     @registers.gen[rd] = @registers.gen[rs] & @registers.gen[rt]
-  end
-
-  # And Immediate
-  def andi(rd, rs, immediate)
-    @registers.gen[rd] = @registers.gen[rs] & immediate
-  end
-
-  def lui()
     true
   end
 
-  # Nor
+  # And Immediate
+  #
+  # $RD = $RS & $RT
+  # Asm format: 'and $rd,$rs,$rt'
+  def andi(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] & immediate
+    true
+  end
+
+  # Load Upper Immediate
+  #
+  # $RT = (imm << 16)
+  # Asm format: 'lui $rt,imm'
+  def lui(rt, imm)
+    @registers.gen[rt] = (imm << 16)
+    true
+  end
+
+  # Not Or
+  #
+  # $RD = ~($RS | $RT)
+  # Asm format: 'nor $rd,$rs,$rt'
   def nor(rd, rs, rt)
-    @registers.gen[rd] = ~ (@registers.gen[rs] | @registers.gen[rt])
+    @registers.gen[rd] = ~(@registers.gen[rs] | @registers.gen[rt])
+    true
   end
 
   # Or
+  #
+  # $RD  = $RS | $RT
+  # Asm format: 'or $rd,$rs,$rt'
   def or_l(rd, rs, rt)
     @registers.gen[rd] = @registers.gen[rs] | @registers.gen[rt]
+    true
   end
 
   # Or Immediate
+  #
+  # $RD = $RS | Immediate
+  # Asm format: 'ori $rd,$rs,imm'
   def ori(rd, rs, immediate)
     @registers.gen[rd] = @registers.gen[rs] | immediate
+    true
   end
+
+  # Exclusive Or
+  #
+  # $RD = $RS ^ $RT
+  # Asm format: 'xor $rd,$rs,$rt'
+  def xor(rd, rs, rt)
+    @registers.gen[rd] = @registers.gen[rs] ^ @registers.gen[rt]
+    true
+  end
+
+  # Exclusive Or Immediate
+  #
+  # $RD = $RS ^ Immediate
+  # Asm format: 'xori $rd,$rs,imm'
+  def xori(rd, rs, immediate)
+    @registers.gen[rd] = @registers.gen[rs] ^ immediate
+    true
+  end
+
+  # Shift Instructions
+  #
+  #
+  #
 
   # Shift Left Logical
   def sll(rd, rs, immediate)
@@ -406,8 +454,8 @@ module MipsOps
   #
   # $RD = 1 if $RS < Immediate
   # Asm format: 'slti $rd,$rs,imm'
-  def slti(rd, rs, imm)
-    if @register.gen[rs] < imm
+  def slti(rd, rs, immediate)
+    if @register.gen[rs] < immediate
       @register.gen[rd] = 1
     else
       @register.gen[rd] = 0
@@ -419,8 +467,8 @@ module MipsOps
   #
   # $RD = 1 if $RS < Immediate
   # Asm format: 'sltiu $rd,$rs,imm'
-  def sltiu()
-    if @register.gen[rs] < imm
+  def sltiu(rd, rs, immediate)
+    if @register.gen[rs] < immediate
       @register.gen[rd] = 1
     else
       @register.gen[rd] = 0

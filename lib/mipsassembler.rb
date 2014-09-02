@@ -204,6 +204,12 @@ module Assembler
     op, args = s.split
     args = reg_to_bin(args.delete("$").split(","))
     mc = ops[op][1]                                 # Opcode
+    if ["lui"].index(op)
+      mc += "00000"                                 # RS n/a
+      mc += sprintf("%05b", args[0])                # RT
+      mc += sprintf("%016b", args[1])               # Immediate
+      return mc
+    end
     mc += sprintf("%05b", args[1])                  # RS
     mc += sprintf("%05b", args[0])                  # RT
     mc += sprintf("%016b", args[2])                 # Immediate
