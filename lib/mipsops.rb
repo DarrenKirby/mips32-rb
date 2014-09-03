@@ -29,32 +29,47 @@ module MipsOps
 
   # Aligned load/store instructions
 
-  # Load Word
-  def lw(rd, source_mem)
-    @registers.gen[rd] = @memory.core[source_mem]
-    true
-  end
-
-  # Load Half-Word
-  def lh(rd, source_mem)
-    @registers.gen[rd] = @memory.core[source_mem]
-    true
-  end
-
-  # Load Half-word Unsigned
-  def lhu(rd, source_mem)
-    @registers.gen[rd] = @memory.core[source_mem]
-    true
-  end
-
   # Load Byte
+  #
+  #
+  #
   def lb(rd, source_mem)
     @registers.gen[rd] = @memory.core[source_mem]
     true
   end
 
   # Load Byte Unsigned
+  #
+  #
+  #
   def lbu(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
+    true
+  end
+
+  # Load Half-Word
+  #
+  #
+  #
+  def lh(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
+    true
+  end
+
+  # Load Half-word Unsigned
+  #
+  #
+  #
+  def lhu(rd, source_mem)
+    @registers.gen[rd] = @memory.core[source_mem]
+    true
+  end
+
+  # Load Word
+  #
+  #
+  #
+  def lw(rd, source_mem)
     @registers.gen[rd] = @memory.core[source_mem]
     true
   end
@@ -81,38 +96,47 @@ module MipsOps
 
   # Load Word Left
   def lwl
+    true
   end
 
   # Load Word Right
   def lwr
+    true
   end
 
   # Store Word Left
   def swl
+    true
   end
 
   # Store Word Right
   def swr
+    true
   end
 
   # Unaligned Load Word
   def ulw
+    true
   end
 
   # Unaligned Load Half-Word
   def ulh
+    true
   end
 
   # Unaligned Load Half-Word Unsigned
   def ulhu
+    true
   end
 
   # Unaligned Store Word
   def usw
+    true
   end
 
   # Unaligned Store Half-Word
   def ush
+    true
   end
 
   # Pseudo instruction
