@@ -660,8 +660,10 @@ module MipsOps
       Kernel.exit(true)
     when 11                                      # print character
       # $a0 = character to print
+      puts @registers.gen[:a0].chr
     when 12                                      # read character
       # $v0 contains character read
+      @registers.gen[:v0] = gets[0].ord
     when 13                                      # open file
       # $a0 = address of null-terminated string containing filename
       # $a1 = flags
@@ -675,7 +677,6 @@ module MipsOps
       # $a1 = address of input buffer
       # $a2 = max number of chars to read
       # $v0 contains number of chars read (0 if EOF, negative if error)
-
       filename = @fp[@registers.gen[:a0]]
       chars = File.open(filename).read(@registers.gen[:a2])
       @memory.core[@registers.gen[:a1]] = chars
