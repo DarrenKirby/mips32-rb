@@ -25,10 +25,13 @@ module Syscalls
       # syscall
     when 4001
       # exit
+      # proto: void _exit(int status);
     when 4002
       # fork
+      # proto: pid_t fork(void);
     when 4003
       # read
+      # proto: ssize_t read(int fd, void *buf, size_t count);
       # $a0 = file descriptor
       # $a1 = address of input buffer
       # $a2 = max number of bytes to read
@@ -36,6 +39,7 @@ module Syscalls
       # $v1 will contain ERRNO if return < 0
     when 4004
       # write
+      # proto: ssize_t write(int fd, const void *buf, size_t count);
       # $a0 = file descriptor
       # $a1 = address of output buffer
       # $a2 = max number of bytes to write
@@ -43,6 +47,8 @@ module Syscalls
       # $v1 will contain ERRNO if return < 0
     when 4005
       # open
+      # proto: int open(const char *pathname, int flags);
+      # proto: int open(const char *pathname, int flags, mode_t mode);
       # $a0 = address of filename
       # $a1 = flags
       # $a2 = optional mode
@@ -50,87 +56,125 @@ module Syscalls
       # $v1 will contain ERRNO if return < 0
     when 4006
       # close
+      # proto: int close(int fd);
       # $a0 = file descriptor
       # $v0 will contain 0 on success, or -1 on error
       # $v1 will contain ERRNO if return < 0
     when 4007
       # waitpid
+      # proto: pid_t waitpid(pid_t pid, int *status, int options);
     when 4008
       # creat
+      # proto: int creat(const char *pathname, mode_t mode);
     when 4009
       # link
+      # proto: int link(const char *oldpath, const char *newpath);
     when 4010
       # unlink
+      # int unlink(const char *pathname);
     when 4011
       # execve
+      # proto: int execve(const char *filename, char *const argv[], char *const envp[]);
     when 4012
       # chdir
+      # proto: int chdir(const char *path);
     when 4013
       # time
+      # proto: time_t time(time_t *t);
     when 4014
       # mknod
+      # proto: int mknod(const char *pathname, mode_t mode, dev_t dev);
     when 4015
       # chmod
+      # proto: int chmod(const char *pathname, mode_t mode);
     when 4016
       # lchown
+      # proto: int lchown(const char *pathname, uid_t owner, gid_t group);
     when 4017
       # break
-    # when 4018 UNUSED
+      # Unimplemented. returns -1.
+    # 4018 UNUSED
       #
     when 4019
       # lseek
+      # proto: off_t lseek(int fd, off_t offset, int whence);
     when 4020
       # getpid
+      # proto: pid_t getpid(void);
     when 4021
       # mount
+      # proto: int mount(const char *source, const char *target, const char *filesystemtype, unsigned long mountflags, const void *data);
     when 4022
       # umount
+      # proto: int umount(const char *target);
     when 4023
       # setuid
+      # proto: int setuid(uid_t uid);
     when 4024
       # getuid
+      # proto: uid_t getuid(void);
     when 4025
       # stime
+      # proto: int stime(const time_t *t);
     when 4026
       # ptrace
+      # proto: long ptrace(enum __ptrace_request request, pid_t pid, void *addr, void *data);
     when 4027
       # alarm
-    # when 4028 UNUSED
+      # proto: unsigned int alarm(unsigned int seconds);
+    # 4028 UNUSED
       #
     when 4029
       # pause
+      # proto: int pause(void);
     when 4030
       # utime
+      # proto: int utime(const char *filename, const struct utimbuf *times);
     when 4031
       # stty
+      # Not implemented. Returns -1.
     when 4032
       # gtty
+      # Not implemented. Returns -1.
     when 4033
       # access
+      # proto: int access(const char *pathname, int mode);
     when 4034
       # nice
+      # proto: int nice(int inc);
     when 4035
       # ftime
+      # Not implemented. Returns -1.
     when 4036
       # sync
+      # proto: void sync(void);
     when 4037
       # kill
+      # proto: int kill(pid_t pid, int sig);
     when 4038
       # rename
+      # proto: int rename(const char *oldpath, const char *newpath);
     when 4039
       # mkdir
+      # proto: int mkdir(const char *pathname, mode_t mode);
     when 4040
       # rmdir
+      # proto: int rmdir(const char *pathname);
     when 4041
       # dup
+      # proto: int dup(int oldfd);
     when 4042
       # pipe
+      # proto: int pipe(int pipefd[2]);
     when 4043
       # times
+      # proto: clock_t times(struct tms *buf);
     when 4044
       # prof
+      # Unimplemented. Returns -1.
     when 4045
       # brk
+      # proto: int brk(void *addr);
     when 4046
       # setgid
     when 4047
@@ -157,7 +201,7 @@ module Syscalls
       # setpdid
     when 4058
       # ulimit
-    # when 4059 UNUSED
+    # 4059 UNUSED
       #
     when 4060
       # umask
@@ -203,11 +247,11 @@ module Syscalls
       # getgroups
     when 4081
       # setgroups
-    # when 4082 RESERVED
+    # 4082 RESERVED
       #
     when 4083
       # symlink
-    # when 4084 UNUSED
+    # 4084 UNUSED
       #
     when 4085
       # readlink
@@ -231,6 +275,7 @@ module Syscalls
       # fchmod
     when 4095
       # fchown
+      # proto: int fchown(int fd, uid_t owner, gid_t group);
     when 4096
       # getpriority
     when 4097
@@ -241,36 +286,66 @@ module Syscalls
       # statfs
     when 4100
       # fstatfs
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
-    when
+    when 4101
+      # ioperm
+    when 4102
+      # socketcall
+    when 4103
+      # syslog
+    when 4104
+      # setitimer
+    when 4105
+      # getitimer
+    when 4106
+      # stat
+    when 4107
+      # lstat
+    when 4108
+      # fstat
+    # 4109 UNUSED
+      # 
+    when 4110
+      # iopl
+    when 4111
+      # vhangup
+    when 4112
+      # idle
+    when 4113
+      # vm86
+    when 4114
+      # wait4
+    when 4115
+      # swapoff
+    when 4116
+      # sysinfo
+    when 4117
+      # ipc
+    when 4118
+      # fsync
+    when 4119
+      # sigreturn
+    when 4120
+      # clone
+    when 4121
+      # setdomainname
+    when 4122
+      # uname
+    when 4123
+      # modify_ldt
+    when 4124
+      # adjtimex
+    when 4125
+      # mprotect
+    when 4126
+      # sigprocmask
+    when 4127
+      # create_module
+    when 4128
+      # init_module
+    when 4129
+      # delete_module
+    when 4130
+      # get_kernel_syms
     when
     when
     when
