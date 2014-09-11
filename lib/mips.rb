@@ -27,8 +27,6 @@ require './mipsops'
 require './mipscoderunner'
 require './mipsassembler'
 
-DEBUG = false
-
 class Mips32Error < StandardError
 end
 
@@ -52,7 +50,7 @@ end
 class Memory
   attr_accessor :core, :data, :stack, :symbol_table
   def initialize()
-    @core = {}          # Core memory
+    @core = {}          # Global memory (0x10000000+), heap (0x10040000+)
     @data = {}          # Program data
     @stack = Stack.new  # Stack
     @symbol_table = {}  # Symbol table
@@ -67,7 +65,7 @@ class Register
       :zero => 0x0, :at => 0x0, :v0 => 0x0, :v1 => 0x0, :a0 => 0x0, :a1 => 0x0, :a2 => 0x0, :a3 => 0x0,
         :t0 => 0x0, :t1 => 0x0, :t2 => 0x0, :t3 => 0x0, :t4 => 0x0, :t5 => 0x0, :t6 => 0x0, :t7 => 0x0,
         :s0 => 0x0, :s1 => 0x0, :s2 => 0x0, :s3 => 0x0, :s4 => 0x0, :s5 => 0x0, :s6 => 0x0, :s7 => 0x0,
-        :t8 => 0x0, :t9 => 0x0, :k0 => 0x0, :k1 => 0x0, :gp => 0x10008000, :sp => 0x7ffffffc,
+        :t8 => 0x0, :t9 => 0x0, :k0 => 0x0, :k1 => 0x0, :gp => 0x10000000, :sp => 0x7ffffffc,
         :fp => 0x0, :ra => 0x0 }
 
     @spe = {
@@ -160,11 +158,6 @@ class Mips32
     true
   end
 
-  def inspect #:nodoc:
-    "#<#{self.class}:0x#{(self.object_id*2).to_s(16)}\b>"
-  end
-
-
   def reset_registers
     @registers = Register.new
     #true
@@ -180,14 +173,6 @@ class Mips32
     @memory =    Memory.new
     true
   end
-
-  alias d_reg dump_registers
-  alias d_mem dump_memory
-  alias d_pro dump_program_data
-  alias d_sym dump_symbol_table
-
-  private
-
 
   def int_to_bitstring(i)
     if i >= 0
@@ -206,12 +191,25 @@ class Mips32
   end
 
   def bitstring_to_int(s, signed=true)
-    if signed && s[0] == 49
+    if signed && s[0].ord == 49
       ~ (flipbits(s).to_i(2) + 1) + 1
     else
       s.to_i(2)
     end
   end
+
+  def inspect #:nodoc:
+    "#<#{self.class}:0x#{(self.object_id*2).to_s(16)}\b>"
+  end
+  
+  alias d_reg dump_registers
+  alias d_mem dump_memory
+  alias d_pro dump_program_data
+  alias d_sym dump_symbol_table
+  alias itob  int_to_bitstring
+  alias btoi  bitstring_to_int
+  
+  private
 
   # It flips the bits
   def flipbits(s)
