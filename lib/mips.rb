@@ -51,6 +51,7 @@ class Memory
   attr_accessor :core, :data, :stack, :symbol_table
   def initialize()
     @core = {}          # Global memory (0x10000000+), heap (0x10040000+)
+    @heap_pointer = 0x10040000
     @data = {}          # Program data
     @stack = Stack.new  # Stack
     @symbol_table = {}  # Symbol table
