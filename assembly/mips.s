@@ -8,6 +8,8 @@ prompt:  .ascii     "Type a string: "
 prompt2: .ascii     "You typed: "
 
 .text
+
+main:
 ori  $s0,$zero,250           # put 250 in register $s0
 ori  $s1,$zero,300           # put 300 in register $s1
 add  $t0,$s0,$s1             # $t0 = $s0 + $s1
