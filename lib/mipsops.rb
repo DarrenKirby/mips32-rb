@@ -614,7 +614,7 @@ module MipsOps
 
   # syscalls
   #
-  #
+  # A simple set of syscalls as found in SPIM
   #
 
   def syscall
@@ -656,6 +656,8 @@ module MipsOps
     when 9                                       # sbrk (allocate heap memory)
       # $a0 = number of bytes to allocate
       # $v0 contains address of allocated memory
+      @registers.gen[:v0] = @memory.heap_pointer
+      @memory.heap_pointer = @memory.heap_pointer + @registers.gen[:a0]
     when 10                                      # exit
       Kernel.exit(true)
     when 11                                      # print character
