@@ -86,7 +86,6 @@ module MipsCodeRunner
         next
       end
 
-
       @memory.data[@registers.spe[:pc]] = line    # place instruction into program data
       @registers.spe[:pc] += 0x4                  # 4byte offset for each address - update program counter
     end
@@ -119,13 +118,15 @@ module MipsCodeRunner
       return true
     end
 
-
     3.times do args.gsub!("$",":") end            # at most three operands
     eval("self.#{op} #{args}")                    # build line of executable Ruby code and run it
     return true
   end
 
   def load_variables_into_memory(lines)
+    if lines.index("main:")
+      lines.delete_at(lines.index("main:"))
+    end
     if lines.index(".data") == nil                # no .data section
       return lines
     end
@@ -163,13 +164,13 @@ module MipsCodeRunner
             @memory.symbol_table[name] = ptr
             ptr += value.to_i
           when ".ascii"
-            @memory.core[ptr] = value
+            @memory.core[ptr] = value[1..-2]
             @memory.symbol_table[name] = ptr
             ptr += value.length
           when ".asciiz"
-            @memory.core[ptr] = (value += "\0")
+            @memory.core[ptr] = (value[1..-2] += "\0")
             @memory.symbol_table[name] = ptr
-            ptr += (value.length + 1)
+            ptr += (value[1..-2].length + 1)
           end
       rescue NoMethodError
         return lines
