@@ -77,9 +77,19 @@ module MipsCodeRunner
       if line.split.length == 1                            # Do we have a label?
         if line == "syscall"
           @memory.data[@registers.spe[:pc]] = line
-          @registers.spe[:pc] += 4
+          @registers.spe[:pc] += 0x4
           next
         end
+
+        if line == "exit"
+          #Kernel.exit()
+          @memory.data[@registers.spe[:pc]] = "li  $v0,10"
+          @memory.data[@registers.spe[:pc]] += 0x4
+          @memory.data[@registers.spe[:pc]] = "syscall"
+          @memory.data[@registers.spe[:pc]] += 0x4
+          next
+        end
+
 
         label = line[0..-2]                                # remove colon
         @memory.symbol_table[label] = @registers.spe[:pc]
@@ -93,12 +103,14 @@ module MipsCodeRunner
   end
 
   def run_mips_instruction(instruction)
+    puts instruction
     #p instruction
     if instruction == "syscall"
       #eval("self.syscall")
       self.send(:syscall)
       return
     end
+
     op, args = instruction.split(" ")
     if op == "and"                                # special cases for instructions
       op = "and_l"                                # whose names are Ruby keywords
