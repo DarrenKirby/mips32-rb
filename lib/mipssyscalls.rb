@@ -303,7 +303,7 @@ module Syscalls
     when 4108
       # fstat
     # 4109 UNUSED
-      # 
+      #
     when 4110
       # iopl
     when 4111
@@ -346,6 +346,183 @@ module Syscalls
       # delete_module
     when 4130
       # get_kernel_syms
+    when 4131
+      # quotactl
+    when 4132
+      # getpgid
+    when 4133
+      # fchdir
+    when 4134
+      # bdflush
+    when 4135
+      # sysfs
+    when 4136
+      # personality
+    when 4137
+      # afs_syscall
+    when 4138
+      # setfsuid
+    when 4139
+      # setfguid
+    when 4140
+      # llseek
+    when 4141
+      # getdents
+    when 4142
+      # newselect
+    when 4143
+      # flock
+    when 4144
+      # msync
+    when 4145
+      # readv
+    when 4146
+      # writev
+    when 4147
+      # cacheflush
+    when 4148
+      # cachectl
+    when 4149
+      # sysmips
+    #when 4150 UNUSED
+      #
+    when 4151
+      # getsid
+    when 4152
+      # fdatasync
+    when 4153
+      # sysctl
+    when 4154
+      # mlock
+    when 4155
+      # munlock
+    when 4156
+      # mlockall
+    when 4157
+      # munlockall
+    when 4158
+      # sched_setparam
+    when 4159
+      # sched_getparam
+    when 4160
+      # sched_setscheduler
+    when 4161
+      # sched_getscheduler
+    when 4162
+      # sched_yield
+    when 4163
+      # sched_get_priority_max
+    when 4164
+      # sched_get_priority_min
+    when 4165
+      # sched_rr_get_interval
+    when 4166
+      # nanosleep
+    when 4167
+      # mremap
+    when 4168
+      # accept
+    when 4169
+      # bind
+    when 4170
+      # connect
+    when 4171
+      # getpeername
+    when 4172
+      # getsockname
+    when 4173
+      # getsockopt
+    when 4174
+      # listen
+    when 4175
+      # recv
+    when 4176
+      # recvfrom
+    when 4177
+      # recvmsg
+    when 4178
+      # send
+    when 4179
+      # sendmsg
+    when 4180
+      # sendto
+    when 4181
+      # setsockopt
+    when 4182
+      # shutdown
+    when 4183
+      # socket
+    when 4184
+      # socketpair
+    when 4185
+      # setresuid
+    when 4186
+      # getresuid
+    when 4187
+      # query_module
+    when 4188
+      # poll
+    when 4189
+      # nfsservctl
+    when 4190
+      # setresgid
+    when 4191
+      # getresgid
+    when 4192
+      # prctl
+    when 4193
+      # rt_sigreturn
+    when 4194
+      # rt_sigaction
+    when 4195
+      # rt_sigprocmask
+    when 4196
+      # rt_sigpending
+    when 4197
+      # rt_sigtimedwait
+    when 4198
+      # rt_sigqueueinfo
+    when 4199
+      # rt_sigsuspend
+    when 4200
+      # pread64
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+
     when
     when
     when
@@ -394,6 +571,266 @@ module Syscalls
     when
     when
     when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+    when
+
 
   end
 end
