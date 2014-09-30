@@ -236,11 +236,17 @@ module MipsOps
   #
 
   # Shift Left Logical
+  #
+  # $RD = $RS << Immediate
+  # Asm format: 'sll $rd,$rs,imm'
   def sll(rd, rs, immediate)
     @registers.gen[rd] = @registers.gen[rs] << immediate
   end
 
   # Shift Right Logical
+  #
+  # $RD = $RS >> Immediate
+  # Asm format: 'srl $rs,$rs,imm'
   def srl(rd, rs, immediate)
     @registers.gen[rd] = @registers.gen[rs] >> immediate
   end
@@ -252,8 +258,8 @@ module MipsOps
 
   # Add (signed)
   #
-  #  $RD = $RS + RT (traps on overflow)
-  #  Asm format: 'add $rd,$rs,$rt'
+  # $RD = $RS + RT (traps on overflow)
+  # Asm format: 'add $rd,$rs,$rt'
   def add(rd, rs, rt)
     tmp = @registers.gen[rs] + @registers.gen[rt]
     if tmp > SIGNED_MAX
@@ -565,56 +571,70 @@ module MipsOps
 ##############
 
 
-  # Control Structures
+  # Branch/Jump Instructions
   #
   #
   #
 
-  # unconditional branch to program label 'targ'
+  # Unconditional Branch
+  #
+  # PC = Label
+  # Asm format: 'b label'
   def b(targ)
+    @registers.spe[:pc] = @memory.symbol_table[targ]
+    true
   end
 
   # Branch on Equal
   #
-  #
-  # branch to targ if a = b
+  # IF ($RS == $RT) PC = Label
+  # Asm format: 'beq $rs,$rt,label'
   def beq(rs, rt, targ)
-    if @registers.spe[:rs] == @registers.spe[:rt]
+    if @registers.gen[:rs] == @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
   end
 
-  # Branch on
+  # Branch Less Than (PSEUDO)
   #
-  #
-  #  branch to targ if  a < b
+  # IF ($RS < $RT) PC = Label
+  # Asm format: 'blt $rs,$rt,label'
   def blt(rs, rt, targ)
-    if @registers.spe[:rs] < @registers.spe[:rt]
+    if @registers.gen[:rs] < @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
   end
 
-  #  branch to targ if  a <= b
+  # Branch Less Than or Equal (PSEUDO)
+  #
+  # IF ($RS <= $RT) PC = Label
+  # Asm format: 'ble $rs,$rt,label'
   def ble(rs, rt, targ)
-    if @registers.spe[:rs] <= @registers.spe[:rt]
+    if @registers.gen[:rs] <= @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
   end
 
-  #  branch to targ if  a > b
+  # Branch Greater Than (PSEUDO)
+  #
+  # IF ($RS > $RT) PC = Label
+  # Asm format: 'bgt $rs,$rt,label'
   def bgt(rs, rt, targ)
-    if @registers.spe[:rs] > @registers.spe[:rt]
+    if @registers.gen[:rs] > @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
   end
 
-  #  branch to targ if  a >= b
+  # Branch Greater Than or Equal (PSEUDO)
+  #
+  # IF ($RS >= $RT) PC = Label
+  # Asm format: 'bge $rs,$rt,label'
   def bge(rs, rt, targ)
-    if @registers.spe[:rs] >= @registers.spe[:rt]
+    if @registers.gen[:rs] >= @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -622,23 +642,31 @@ module MipsOps
 
   # Branch if Not Equal
   #
-  #
-  #  branch to targ if  a != b
+  # IF ($RS != $RT) PC = Label
+  # Asm format: 'bne $rs,$rt,label'
   def bne(rs, rt, targ)
-    if @registers.spe[:rs] != @registers.spe[:rt]
+    if @registers.gen[:rs] != @registers.gen[:rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
   end
 
-  # Unconditional jump
+  # Unconditional Jump
+  #
+  # PC = Label
+  # Asm format: 'j label'
   def j(targ)
     @registers.spe[:pc] = @memory.symbol_table[targ]
     true
   end
 
-  # Jump register
-  def jr(targ)
+  # Jump Register
+  #
+  # PC = $RS
+  # Asm format: 'j $rs'
+  def jr(rs)
+    @registers.spe[:pc] = @registers.gen[:rs]
+    true
   end
 
   # Jump and Link
