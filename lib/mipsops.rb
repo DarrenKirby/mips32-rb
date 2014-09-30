@@ -31,8 +31,8 @@ module MipsOps
 
   # Load Byte
   #
-  #
-  #
+  # $RD = MEM[BASE] + OFFSET
+  # Asm format: 'lb $rd 4(0x10000000)'
   def lb(rd, source_mem)
     @registers.gen[rd] = @memory.core[source_mem]
     true
@@ -574,28 +574,61 @@ module MipsOps
   def b(targ)
   end
 
+  # Branch on Equal
+  #
+  #
   # branch to targ if a = b
-  def beq(a, b, targ)
+  def beq(rs, rt, targ)
+    if @registers.spe[:rs] == @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
+  # Branch on
+  #
+  #
   #  branch to targ if  a < b
-  def blt(a, b, targ)
+  def blt(rs, rt, targ)
+    if @registers.spe[:rs] < @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
   #  branch to targ if  a <= b
-  def ble(a, b, targ)
+  def ble(rs, rt, targ)
+    if @registers.spe[:rs] <= @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
   #  branch to targ if  a > b
-  def bgt(a, b, targ)
+  def bgt(rs, rt, targ)
+    if @registers.spe[:rs] > @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
   #  branch to targ if  a >= b
-  def bge(a, b, targ)
+  def bge(rs, rt, targ)
+    if @registers.spe[:rs] >= @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
+  # Branch if Not Equal
+  #
+  #
   #  branch to targ if  a != b
-  def bne(a, b, targ)
+  def bne(rs, rt, targ)
+    if @registers.spe[:rs] != @registers.spe[:rt]
+      @registers.spe[:pc] = @memory.symbol_table[targ]
+    end
+    true
   end
 
   # Unconditional jump
