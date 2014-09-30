@@ -167,6 +167,10 @@ module MipsCodeRunner
             @memory.core[ptr] = value
             @memory.symbol_table[name] = ptr
             ptr += 4
+          when ".half"
+            @memory.core[ptr] = value
+            @memory.symbol_table[name] = ptr
+            ptr += 2
           when ".byte"
             @memory.core[ptr] = value
             @memory.symbol_table[name] = ptr
