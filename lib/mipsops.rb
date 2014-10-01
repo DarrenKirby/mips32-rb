@@ -305,6 +305,8 @@ module MipsOps
   # $RD = count_leading_ones($RS)
   # Asm format: 'clo $rd,$rs'
   def clo(rd, rs)
+    word = int_to_bitstring(@registers.gen[rs])
+    @registers.gen[rd] = word.index("0")
     true
   end
 
@@ -313,6 +315,8 @@ module MipsOps
   # $RD = count_leading_zeros($RS)
   # Asm format: 'clz $rd,$rs'
   def clz(rd, rs)
+    word = int_to_bitstring(@registers.gen[rs])
+    @registers.gen[rd] = word.index("1")
     true
   end
 
