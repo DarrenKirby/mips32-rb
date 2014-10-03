@@ -548,12 +548,18 @@ module MipsOps
 #########
 
   # Move From Hi
+  #
+  # $RD = $HI
+  # Asm format: 'mfhi $rd,$hi'
   def mfhi(rd)
     @registers.gen[rd] = @registers.spe[:hi]
     true
   end
 
   # Move From Lo
+  #
+  # $RD = $LO
+  # Asm format: 'mflo $rd,$hi'
   def mflo(rd)
     @registers.gen[rd] = @registers.spe[:lo]
     true
