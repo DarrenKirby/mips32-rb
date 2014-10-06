@@ -80,8 +80,6 @@ module Assembler
       "lwc2"  => [ "M", "110001" ],
       "ldc1"  => [ "M", "110101" ],
       "ldc2"  => [ "M", "110110" ],
-      "beq"   => [ "M", "000100" ],
-      "bne"   => [ "M", "000101" ],
 
     # Jump Instructions (J-Format)
     # [Opcode (6)| Address (26)
@@ -89,11 +87,18 @@ module Assembler
       "j"     => [ "J", "000010" ],
       "jal"   => [ "J", "000011" ],
 
+    # Branch instructions
+    # [Opcode (6)| RS (5)| RT (5)| PC relative offset (16)]
+      "beq"   => [ "B", "000100" ],
+      "bne"   => [ "B", "000101" ],
+
 
     # pseudo instructions
       "li"    => [ "P" ],
       "move"  => [ "P" ],
       "la"    => [ "P" ],
+      "blt"   => [ "P" ],
+      "b"     => [ "P" ],
 
     }
 
@@ -101,6 +106,7 @@ module Assembler
       mc = sprintf("%032b", 12)
       return mc
     end
+
     q = Kernel.caller[0]
     if ops[instruction.split[0]][0] == "R"
       mc = r_type(instruction,ops)
@@ -114,6 +120,9 @@ module Assembler
       print "Opcode: #{mc[0..5]} Base: #{mc[6..10]} RT: #{mc[11..15]} Offset: #{mc[16..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     elsif ops[instruction.split[0]][0] == "P"
       mc = p_type(instruction,ops)
+    elsif ops[instruction.split[0]][0] == "B"
+      mc = b_type(instruction,ops)
+      print "Opcode: #{mc[0..5]} RS: #{mc[6..10]} RT: #{mc[11..15]} Offset: #{mc[16..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
     else
       mc = j_type(instruction,ops)
       print "Opcode: #{mc[0..5]} Address: #{mc[6..-1]}\n" if q[(q.index("`")+1)..-2] == "irb_binding"
@@ -136,12 +145,31 @@ module Assembler
     n
   end
 
+  # Assemble a branch instruction
+  def b_type(s,ops)
+    op, args = s.split
+    a = args.split(",")
+    label = a.pop
+    args = a.join(",")
+    args = reg_to_bin(args.delete("$").split(","))
+    # dirty hack...fix this:
+    pc = @memory.symbol_table[label] - 0x00400000
+    mc = ops[op][1]
+    mc += sprintf("%05b", args[0]) # RS
+    mc += sprintf("%05b", args[1]) # RT
+    mc += sprintf("%016b", pc)
+  end
+
   # Assemble a pseudo instruction
   def p_type(s,ops)
     op, args = s.split
     a = args.split(",")
     if op == "li"
       return i_type("ori #{a[0]},$zero,#{a[1]}", ops)
+    end
+
+    if op == "b"
+      return b_type("beq $zero,$zero,#{a[-1]}", ops)
     end
 
     if op == "la"
@@ -244,7 +272,6 @@ module Assembler
       mc += sprintf("%026b", @memory.symbol_table[arg])
       return mc
     end
-
   end
 
   def dissemble(instruction)
@@ -254,4 +281,5 @@ module Assembler
     else
     end
   end
+
 end

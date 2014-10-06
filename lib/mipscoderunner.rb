@@ -23,12 +23,21 @@ module MipsCodeRunner
   end
 
   def execute
-    num_instructions = @memory.data.length
-    while num_instructions > 0
-      run_mips_instruction(@memory.data[@registers.spe[:pc]]) # fetch the instruction at the address in the program counter
-      @registers.spe[:pc] += 4                                # increase PC to point to next instruction
-      num_instructions -= 1
+    #num_instructions = @memory.data.length
+    n = 1
+    until @memory.data[@registers.spe[:pc]] == nil
+      run_mips_instruction(@memory.data[@registers.spe[:pc]])
+      puts "executed #{n} instruction(s): #{@memory.data[@registers.spe[:pc]]}"
+      @registers.spe[:pc] += 4
+      n+=1
     end
+    #while num_instructions > 0
+    #  run_mips_instruction(@memory.data[@registers.spe[:pc]]) # fetch the instruction at the address in the program counter
+    #  puts "executed #{n} instruction(s): #{@memory.data[@registers.spe[:pc]]}"
+    #  @registers.spe[:pc] += 4                                # increase PC to point to next instruction
+    #  num_instructions -= 1
+    #  n += 1
+    #end
     @registers.gen[:pc] = 0x00400000                          # reset program counter after last instruction runs
     true
   end
@@ -81,14 +90,14 @@ module MipsCodeRunner
           next
         end
 
-        if line == "exit"
+        #if line == "exit"
           #Kernel.exit()
-          @memory.data[@registers.spe[:pc]] = "li  $v0,10"
-          @memory.data[@registers.spe[:pc]] += 0x4
-          @memory.data[@registers.spe[:pc]] = "syscall"
-          @memory.data[@registers.spe[:pc]] += 0x4
-          next
-        end
+          #@memory.data[@registers.spe[:pc]] = "li  $v0,10"
+          #@memory.data[@registers.spe[:pc]] += 0x4
+          #@memory.data[@registers.spe[:pc]] = "syscall"
+          #@memory.data[@registers.spe[:pc]] += 0x4
+          #next
+        #end
 
 
         label = line[0..-2]                                # remove colon
@@ -99,11 +108,14 @@ module MipsCodeRunner
       @memory.data[@registers.spe[:pc]] = line    # place instruction into program data
       @registers.spe[:pc] += 0x4                  # 4byte offset for each address - update program counter
     end
+    @memory.data[@registers.spe[:pc]] = nil       # mark last instruction
     @registers.spe[:pc] = 0x00400000              # reset the program counter to point to first instruction
   end
 
   def run_mips_instruction(instruction)
-    puts instruction
+    if instruction == nil
+      return
+    end
     #p instruction
     if instruction == "syscall"
       #eval("self.syscall")
@@ -112,12 +124,15 @@ module MipsCodeRunner
     end
 
     op, args = instruction.split(" ")
+
     if op == "and"                                # special cases for instructions
       op = "and_l"                                # whose names are Ruby keywords
     end
+
     if op == "or"
       op = "or_l"
     end
+
     if op == "la"
       args = args.split(",")
       args[0].gsub!("$",":")
@@ -125,12 +140,20 @@ module MipsCodeRunner
       return true
     end
 
-    if op == "j"
+    if ["j", "b"].index(op)
       eval("self.#{op} '#{args}'")
       return true
     end
 
     3.times do args.gsub!("$",":") end            # at most three operands
+
+    if ["bne", "beq"].index(op)
+      a = args.split(",")
+      eval("self.#{op} #{a[0]},#{a[1]},'#{a[2]}'")
+      return true
+    end
+
+    #printf("RCode: #{op} #{args}\n")
     eval("self.#{op} #{args}")                    # build line of executable Ruby code and run it
     return true
   end

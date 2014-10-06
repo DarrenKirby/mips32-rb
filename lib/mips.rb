@@ -2,7 +2,7 @@
 #
 # = Description
 #
-# A MIPS32 emulator
+# A MIPS32 emulator/assembly language interpreter
 #
 # = Copyright and Disclaimer
 #
@@ -154,6 +154,9 @@ class Mips32
       k_arr << k
     end
     k_arr.sort.each do |a|
+      if @memory.data[a] == nil
+        return true
+      end
       puts sprintf("0x%08x: %-20s %032s", a, @memory.data[a], assemble(@memory.data[a]))
     end
     true
@@ -202,14 +205,14 @@ class Mips32
   def inspect #:nodoc:
     "#<#{self.class}:0x#{(self.object_id*2).to_s(16)}\b>"
   end
-  
+
   alias d_reg dump_registers
   alias d_mem dump_memory
   alias d_pro dump_program_data
   alias d_sym dump_symbol_table
   alias itob  int_to_bitstring
   alias btoi  bitstring_to_int
-  
+
   private
 
   # It flips the bits

@@ -476,10 +476,10 @@ module MipsOps
   # $RD = 1 if $RS < $RT else 0
   # Asm format: 'slt $rd,$rs,$rt'
   def slt(rd, rs, rt)
-    if @register.gen[rs] < @register.gen[rt]
-      @register.gen[rd] = 1
+    if @registers.gen[rs] < @registers.gen[rt]
+      @registers.gen[rd] = 1
     else
-      @register.gen[rd] = 0
+      @registers.gen[rd] = 0
     end
     true
   end
@@ -489,10 +489,10 @@ module MipsOps
   # $RD = 1 if $RS < Immediate
   # Asm format: 'slti $rd,$rs,imm'
   def slti(rd, rs, immediate)
-    if @register.gen[rs] < immediate
-      @register.gen[rd] = 1
+    if @registers.gen[rs] < immediate
+      @registers.gen[rd] = 1
     else
-      @register.gen[rd] = 0
+      @registers.gen[rd] = 0
     end
     true
   end
@@ -502,10 +502,10 @@ module MipsOps
   # $RD = 1 if $RS < Immediate
   # Asm format: 'sltiu $rd,$rs,imm'
   def sltiu(rd, rs, immediate)
-    if @register.gen[rs] < immediate
-      @register.gen[rd] = 1
+    if @registers.gen[rs] < immediate
+      @registers.gen[rd] = 1
     else
-      @register.gen[rd] = 0
+      @registers.gen[rd] = 0
     end
     true
   end
@@ -515,10 +515,10 @@ module MipsOps
   # $RD = 1 if $RS < $RT else 0
   # Asm format: 'sltu $rd,$rs,imm'
   def sltu(rd, rs, rt)
-    if @register.gen[rs] < @register.gen[rt]
-      @register.gen[rd] = 1
+    if @registers.gen[rs] < @registers.gen[rt]
+      @registers.gen[rd] = 1
     else
-      @register.gen[rd] = 0
+      @registers.gen[rd] = 0
     end
     true
   end
@@ -600,7 +600,7 @@ module MipsOps
   # IF ($RS == $RT) PC = Label
   # Asm format: 'beq $rs,$rt,label'
   def beq(rs, rt, targ)
-    if @registers.gen[:rs] == @registers.gen[:rt]
+    if @registers.gen[rs] == @registers.gen[rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -611,7 +611,7 @@ module MipsOps
   # IF ($RS < $RT) PC = Label
   # Asm format: 'blt $rs,$rt,label'
   def blt(rs, rt, targ)
-    if @registers.gen[:rs] < @registers.gen[:rt]
+    if @registers.gen[rs] < @registers.gen[rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -622,7 +622,7 @@ module MipsOps
   # IF ($RS <= $RT) PC = Label
   # Asm format: 'ble $rs,$rt,label'
   def ble(rs, rt, targ)
-    if @registers.gen[:rs] <= @registers.gen[:rt]
+    if @registers.gen[rs] <= @registers.gen[rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -633,7 +633,7 @@ module MipsOps
   # IF ($RS > $RT) PC = Label
   # Asm format: 'bgt $rs,$rt,label'
   def bgt(rs, rt, targ)
-    if @registers.gen[:rs] > @registers.gen[:rt]
+    if @registers.gen[rs] > @registers.gen[rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -644,7 +644,7 @@ module MipsOps
   # IF ($RS >= $RT) PC = Label
   # Asm format: 'bge $rs,$rt,label'
   def bge(rs, rt, targ)
-    if @registers.gen[:rs] >= @registers.gen[:rt]
+    if @registers.gen[rs] >= @registers.gen[rt]
       @registers.spe[:pc] = @memory.symbol_table[targ]
     end
     true
@@ -654,9 +654,9 @@ module MipsOps
   #
   # IF ($RS != $RT) PC = Label
   # Asm format: 'bne $rs,$rt,label'
-  def bne(rs, rt, targ)
-    if @registers.gen[:rs] != @registers.gen[:rt]
-      @registers.spe[:pc] = @memory.symbol_table[targ]
+  def bne(rs, rt, label)
+    if @registers.gen[rs] != @registers.gen[rt]
+      @registers.spe[:pc] = @memory.symbol_table[label]
     end
     true
   end
@@ -675,7 +675,7 @@ module MipsOps
   # PC = $RS
   # Asm format: 'j $rs'
   def jr(rs)
-    @registers.spe[:pc] = @registers.gen[:rs]
+    @registers.spe[:pc] = @registers.gen[rs]
     true
   end
 

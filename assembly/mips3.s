@@ -1,5 +1,5 @@
 # mips3.s
-# read from a file
+# test for labels
 
 .data
 
@@ -32,13 +32,12 @@ label2:
     la   $a0,msg3
     syscall
     move $t4,$t5
-    li $a2,40
-    li $v0,14
     j label1
 
 exit:
     li   $v0,4
     la   $a0,msg4
     syscall
-    li  $v0,10                           # place exit code in $v0
-    syscall                              # call the operating system
+    # commented out because this will quit irb...
+    #li  $v0,10                           # place exit code in $v0
+    #syscall                              # call the operating system

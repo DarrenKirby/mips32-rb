@@ -33,5 +33,6 @@ add  $a0,$s0,$s1                     # add integers, place sum in $a0
 li  $v0,1                            # place print int code in $v0
 syscall                              # call the operating system
 
+# commented out because this will quit irb...
 # li  $v0,10                           # place exit code in $v0
 # syscall                              # call the operating system
