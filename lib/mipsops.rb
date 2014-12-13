@@ -692,16 +692,16 @@ module MipsOps
     case @registers.gen[:v0]                     # $v0 holds the syscall code
     when 1                                       # print integer
       # $a0 = integer to print
-      puts @registers.gen[:a0]
+      print @registers.gen[:a0]
     when 2                                       # print float
       # $f12 = float to print
-      puts @registers.fpr[:f12]
+      print @registers.fpr[:f12]
     when 3                                       # print double
       # $f12 = double to print
-      puts @registers.fpr[:f12]
+      print @registers.fpr[:f12]
     when 4                                       # print string
       # $a0 = address of null-terminated string to print
-      puts @memory.core[@registers.gen[:a0]]
+      print @memory.core[@registers.gen[:a0]]
     when 5                                       # read integer
       # $v0 contains integer read
       @registers.gen[:v0] = gets.chomp.to_i
@@ -733,7 +733,7 @@ module MipsOps
       Kernel.exit(true)
     when 11                                      # print character
       # $a0 = character to print
-      puts @registers.gen[:a0].chr
+      print @registers.gen[:a0].chr
     when 12                                      # read character
       # $v0 contains character read
       @registers.gen[:v0] = gets[0].ord
