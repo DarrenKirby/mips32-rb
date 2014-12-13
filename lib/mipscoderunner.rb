@@ -27,7 +27,7 @@ module MipsCodeRunner
     n = 1
     until @memory.data[@registers.spe[:pc]] == nil
       run_mips_instruction(@memory.data[@registers.spe[:pc]])
-      puts "executed #{n} instruction(s): #{@memory.data[@registers.spe[:pc]]}"
+      #puts "executed #{n} instruction(s): #{@memory.data[@registers.spe[:pc]]}"
       @registers.spe[:pc] += 4
       n+=1
     end
